@@ -37,8 +37,16 @@
     "solidjs",
     "capacitor"
   ],
-  "author": "",
+  "author": "Baur Software",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Baur-Software/Figma-To"
+  },
+  "bugs": {
+    "url": "https://github.com/Baur-Software/Figma-To/issues"
+  },
+  "homepage": "https://github.com/Baur-Software/Figma-To#readme",
   "dependencies": {
     "@figma/rest-api-spec": "^0.34.0"
   },
