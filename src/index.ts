@@ -1,0 +1,99 @@
+/**
+ * Figma to Tailwind Design Token Normalizer
+ *
+ * A library for normalizing Figma design tokens (via MCP server or REST API)
+ * to Tailwind CSS v4 and Ionic Framework themes.
+ *
+ * @example
+ * ```typescript
+ * import {
+ *   createFigmaAdapter,
+ *   createTailwindIonicAdapter,
+ * } from '@figma-to-tailwind/core';
+ *
+ * // Parse Figma data
+ * const figmaAdapter = createFigmaAdapter();
+ * const theme = await figmaAdapter.parse({ mcpData: figmaResponse });
+ *
+ * // Generate Tailwind/Ionic output
+ * const outputAdapter = createTailwindIonicAdapter();
+ * const output = await outputAdapter.transform(theme);
+ *
+ * // Use the generated CSS
+ * console.log(output.css);
+ * ```
+ */
+
+// =============================================================================
+// Schema Types (Re-exports)
+// =============================================================================
+
+export * from './schema/index.js';
+
+// =============================================================================
+// Adapters
+// =============================================================================
+
+export {
+  FigmaAdapter,
+  createFigmaAdapter,
+  type FigmaInput,
+} from './adapters/figma/index.js';
+
+export {
+  TailwindIonicAdapter,
+  createTailwindIonicAdapter,
+  type TailwindIonicOutput,
+  type TailwindIonicAdapterOptions,
+} from './adapters/tailwind-ionic/index.js';
+
+// =============================================================================
+// Convenience Functions
+// =============================================================================
+
+import { createFigmaAdapter, type FigmaInput } from './adapters/figma/index.js';
+import {
+  createTailwindIonicAdapter,
+  type TailwindIonicAdapterOptions,
+  type TailwindIonicOutput,
+} from './adapters/tailwind-ionic/index.js';
+import type { ThemeFile } from './schema/tokens.js';
+
+/**
+ * Quick conversion from Figma data to Tailwind/Ionic CSS
+ *
+ * @example
+ * ```typescript
+ * const output = await figmaToTailwind({ mcpData: figmaResponse });
+ * fs.writeFileSync('theme.css', output.css);
+ * ```
+ */
+export async function figmaToTailwind(
+  input: FigmaInput,
+  options?: TailwindIonicAdapterOptions
+): Promise<TailwindIonicOutput> {
+  const figmaAdapter = createFigmaAdapter();
+  const theme = await figmaAdapter.parse(input);
+
+  const outputAdapter = createTailwindIonicAdapter();
+  return outputAdapter.transform(theme, options);
+}
+
+/**
+ * Parse Figma data to normalized theme format
+ */
+export async function parseTheme(input: FigmaInput): Promise<ThemeFile> {
+  const adapter = createFigmaAdapter();
+  return adapter.parse(input);
+}
+
+/**
+ * Generate Tailwind/Ionic output from normalized theme
+ */
+export async function generateOutput(
+  theme: ThemeFile,
+  options?: TailwindIonicAdapterOptions
+): Promise<TailwindIonicOutput> {
+  const adapter = createTailwindIonicAdapter();
+  return adapter.transform(theme, options);
+}

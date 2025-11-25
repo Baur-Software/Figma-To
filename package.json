@@ -1,0 +1,57 @@
+{
+  "name": "@figma-to-tailwind/core",
+  "version": "0.1.0",
+  "description": "Normalize Figma MCP design tokens to Tailwind/Ionic theme interfaces",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./adapters/figma": {
+      "import": "./dist/adapters/figma/index.js",
+      "types": "./dist/adapters/figma/index.d.ts"
+    },
+    "./adapters/tailwind-ionic": {
+      "import": "./dist/adapters/tailwind-ionic/index.js",
+      "types": "./dist/adapters/tailwind-ionic/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "figma",
+    "tailwind",
+    "ionic",
+    "design-tokens",
+    "mcp",
+    "solidjs",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@figma/rest-api-spec": "^0.34.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
