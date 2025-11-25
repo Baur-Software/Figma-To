@@ -1,13 +1,13 @@
 # Contributing
 
-Thanks for your interest in contributing to `@figma-to-tailwind/core`!
+Thanks for your interest in contributing to `@baur-software/figma-to`!
 
 ## Getting Started
 
 ```bash
 # Clone the repository
-git clone git@github.com:Baur-Software/Figma-To-Tailwind.git
-cd Figma-To-Tailwind
+git clone git@github.com:Baur-Software/Figma-To.git
+cd Figma-To
 
 # Install dependencies
 npm install

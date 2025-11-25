@@ -1,6 +1,6 @@
 # Roadmap
 
-This document outlines planned features and improvements for `@figma-to-tailwind/core`.
+This document outlines planned features and improvements for `@baur-software/figma-to`.
 
 ## Current Status (v1.0)
 
@@ -45,7 +45,7 @@ This document outlines planned features and improvements for `@figma-to-tailwind
 
 ### Developer Experience
 
-- [ ] **CLI tool** - `npx figma-to-tailwind sync` command
+- [ ] **CLI tool** - `npx figma-to sync` command
 - [ ] **Watch mode** - Auto-regenerate on Figma webhook events
 - [ ] **Figma plugin** - Export directly from Figma UI
 - [ ] **VS Code extension** - Sync from editor command palette
