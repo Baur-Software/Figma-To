@@ -5,17 +5,13 @@
  * into normalized design tokens.
  */
 
-import type {
-  LocalVariable,
-  LocalVariableCollection,
-  GetLocalVariablesResponse,
-} from '@figma/rest-api-spec';
-import type { FigmaMCPDataResponse } from '../../schema/figma.js';
+import type { GetLocalVariablesResponse } from '@figma/rest-api-spec';
+import type { FigmaMCPDataResponse, MCPSimplifiedVariables } from '../../schema/figma.js';
 import type {
   ThemeFile,
   InputAdapter,
 } from '../../schema/tokens.js';
-import { parseVariables } from './parser.js';
+import { parseVariables, parseSimplifiedVariables } from './parser.js';
 
 // =============================================================================
 // Input Types
@@ -29,8 +25,12 @@ export interface FigmaInput {
   mcpData?: FigmaMCPDataResponse;
   /** Data from REST API /variables/local endpoint */
   variablesResponse?: GetLocalVariablesResponse;
+  /** Simplified variables from MCP get_variable_defs tool */
+  simplifiedVariables?: MCPSimplifiedVariables;
   /** Figma file key (for metadata) */
   fileKey?: string;
+  /** File name (for metadata when using simplified variables) */
+  fileName?: string;
 }
 
 // =============================================================================
@@ -53,8 +53,8 @@ export class FigmaAdapter implements InputAdapter<FigmaInput> {
   async validate(source: FigmaInput): Promise<{ valid: boolean; errors?: string[] }> {
     const errors: string[] = [];
 
-    if (!source.mcpData && !source.variablesResponse) {
-      errors.push('Either mcpData or variablesResponse must be provided');
+    if (!source.mcpData && !source.variablesResponse && !source.simplifiedVariables) {
+      errors.push('Either mcpData, variablesResponse, or simplifiedVariables must be provided');
     }
 
     if (source.mcpData) {
@@ -75,6 +75,12 @@ export class FigmaAdapter implements InputAdapter<FigmaInput> {
       }
     }
 
+    if (source.simplifiedVariables) {
+      if (Object.keys(source.simplifiedVariables).length === 0) {
+        errors.push('Simplified variables object is empty');
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors: errors.length > 0 ? errors : undefined,
@@ -91,31 +97,32 @@ export class FigmaAdapter implements InputAdapter<FigmaInput> {
       throw new Error(`Invalid Figma input: ${validation.errors?.join(', ')}`);
     }
 
-    // Extract variables and collections from source
-    let variables: Record<string, LocalVariable>;
-    let collections: Record<string, LocalVariableCollection>;
-    let fileName = 'Untitled';
+    let tokenCollections;
+    let fileName = source.fileName || 'Untitled';
     let lastModified: string | undefined;
+    let sourceType: 'figma-api' | 'figma-mcp' | 'figma-mcp-simplified';
 
     if (source.variablesResponse) {
-      // Prefer REST API response (more complete)
-      variables = source.variablesResponse.meta.variables;
-      collections = source.variablesResponse.meta.variableCollections;
+      // Prefer REST API response (most complete)
+      const variables = source.variablesResponse.meta.variables;
+      const collections = source.variablesResponse.meta.variableCollections;
+      tokenCollections = parseVariables(variables, collections);
+      sourceType = 'figma-api';
+    } else if (source.simplifiedVariables) {
+      // Use simplified MCP format (from get_variable_defs)
+      tokenCollections = parseSimplifiedVariables(source.simplifiedVariables);
+      sourceType = 'figma-mcp-simplified';
     } else if (source.mcpData) {
-      // Fall back to MCP data
-      variables = source.mcpData.variables || {};
-      collections = source.mcpData.variableCollections || {};
+      // Fall back to full MCP data
+      const variables = source.mcpData.variables || {};
+      const collections = source.mcpData.variableCollections || {};
+      tokenCollections = parseVariables(variables, collections);
       fileName = source.mcpData.name;
       lastModified = source.mcpData.lastModified;
+      sourceType = 'figma-mcp';
     } else {
       throw new Error('No valid data source');
     }
-
-    // Parse variables into collections
-    const tokenCollections = parseVariables(variables, collections);
-
-    // Determine source type
-    const sourceType = source.variablesResponse ? 'figma-api' : 'figma-mcp';
 
     // Build theme file
     const theme: ThemeFile = {
