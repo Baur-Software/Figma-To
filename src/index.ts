@@ -47,6 +47,13 @@ export {
   type TailwindIonicAdapterOptions,
 } from './adapters/tailwind-ionic/index.js';
 
+export {
+  ScssAdapter,
+  createScssAdapter,
+  type ScssOutput,
+  type ScssAdapterOptions,
+} from './adapters/scss/index.js';
+
 // =============================================================================
 // Convenience Functions
 // =============================================================================
@@ -57,6 +64,11 @@ import {
   type TailwindIonicAdapterOptions,
   type TailwindIonicOutput,
 } from './adapters/tailwind-ionic/index.js';
+import {
+  createScssAdapter,
+  type ScssAdapterOptions,
+  type ScssOutput,
+} from './adapters/scss/index.js';
 import type { ThemeFile } from './schema/tokens.js';
 
 /**
@@ -95,5 +107,36 @@ export async function generateOutput(
   options?: TailwindIonicAdapterOptions
 ): Promise<TailwindIonicOutput> {
   const adapter = createTailwindIonicAdapter();
+  return adapter.transform(theme, options);
+}
+
+/**
+ * Quick conversion from Figma data to SCSS
+ *
+ * @example
+ * ```typescript
+ * const output = await figmaToScss({ simplifiedVariables: mcpVariables });
+ * fs.writeFileSync('_variables.scss', output.files['_variables.scss']);
+ * ```
+ */
+export async function figmaToScss(
+  input: FigmaInput,
+  options?: ScssAdapterOptions
+): Promise<ScssOutput> {
+  const figmaAdapter = createFigmaAdapter();
+  const theme = await figmaAdapter.parse(input);
+
+  const outputAdapter = createScssAdapter();
+  return outputAdapter.transform(theme, options);
+}
+
+/**
+ * Generate SCSS output from normalized theme
+ */
+export async function generateScssOutput(
+  theme: ThemeFile,
+  options?: ScssAdapterOptions
+): Promise<ScssOutput> {
+  const adapter = createScssAdapter();
   return adapter.transform(theme, options);
 }
