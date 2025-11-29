@@ -2,7 +2,7 @@
 
 This document outlines planned features and improvements for `@baur-software/figma-to`.
 
-## Current Status (v0.3.0)
+## Current Status (v0.4.0)
 
 - Figma REST API and MCP server input support
 - **MCP variable defs** - Direct support for `get_variable_defs` output including `Font()` and `Effect()` strings
@@ -53,6 +53,7 @@ This document outlines planned features and improvements for `@baur-software/fig
 ## Completed Features
 
 ### Token Types ✅
+
 - [x] Typography composites - Full text style tokens
 - [x] Shadow tokens - Box shadow and drop shadow
 - [x] Gradient tokens - Linear, radial, and conic
@@ -60,17 +61,20 @@ This document outlines planned features and improvements for `@baur-software/fig
 - [x] Animation tokens - Keyframes and sequences
 
 ### Output Adapters ✅
+
 - [x] Tailwind CSS v4 - `@theme` with OKLCH/hex
 - [x] Ionic Framework - CSS custom properties
 - [x] SCSS/Sass - Variables, maps, and mixins
 
 ### Developer Experience ✅
+
 - [x] CLI tool - `npx figma-to sync`
 - [x] Diff output - Show changes between syncs
 - [x] Dry run mode - Preview without writing
 - [x] GitHub Actions - CI/CD with test workflow (release auth scope pending)
 
 ### Token Linting ✅
+
 - [x] 19 built-in rules covering naming, values, structure, and references
 - [x] Dotfile config (`.figmatorc`, `figma-to.config.js`, package.json)
 - [x] Built-in presets: `recommended`, `strict`, `minimal`
@@ -81,13 +85,16 @@ This document outlines planned features and improvements for `@baur-software/fig
 ## Future Exploration
 
 ### Claude Agent SDK Integration
+
 - **SCSS Agent** - Claude agent for SCSS output
 - **React Native Agent** - Mobile StyleSheet generation
 - **CSS-in-JS Agent** - styled-components/Emotion output
 - **Multi-platform Agent** - Single agent, multiple formats
 
 ### Bidirectional Sync (Code → Figma)
+
 The **Figma Output Adapter** would enable:
+
 - Parse CSS/SCSS files to extract token values
 - Push color, spacing, and typography changes back to Figma
 - Two-way sync for design-development collaboration
