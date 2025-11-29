@@ -13,61 +13,78 @@ This document outlines planned features and improvements for `@baur-software/fig
 - **CLI tool** - `figma-to sync` command for quick token generation
 - **SCSS/Sass output** - Variables, maps, and mixins
 - **TokenTypeRegistry** - Extensible architecture for adding new token types (Open/Closed principle)
+- **Token linting** - 8 built-in rules for naming, values, and structure validation
 
-## Planned Features
+## Priority Features
 
-### Input Adapters
+### 🔥 High Priority
 
-- [ ] **Tokens Studio** - Import from Tokens Studio JSON format
-- [ ] **Style Dictionary** - Parse Style Dictionary token files
-- [ ] **Adobe XD** - Support Adobe XD design tokens (if API available)
-- [ ] **Sketch** - Parse Sketch document colors and styles
+| Feature | Category | Effort | Description |
+|---------|----------|--------|-------------|
+| **Figma Output Adapter** | Bidirectional | Large | Push code changes back to Figma (code → Figma sync) |
+| **CSS-in-JS** | Output | Medium | styled-components, Emotion, vanilla-extract objects |
+| **Watch mode** | DX | Medium | Auto-regenerate on Figma webhook events |
 
-### Output Adapters
+### 🎯 Medium Priority
 
-- [ ] **CSS Modules** - Generate scoped CSS module files
-- [x] **SCSS/Sass** - Output as Sass variables and maps
-- [ ] **CSS-in-JS** - Generate objects for styled-components, Emotion, vanilla-extract
-- [ ] **React Native** - StyleSheet-compatible output for mobile
-- [ ] **Swift/Kotlin** - Native mobile platform color constants
-- [ ] **Android XML** - Android resource XML format
+| Feature | Category | Effort | Description |
+|---------|----------|--------|-------------|
+| **Tokens Studio** | Input | Medium | Import from Tokens Studio JSON format |
+| **Style Dictionary** | Input | Medium | Parse Style Dictionary token files |
+| **React Native** | Output | Medium | StyleSheet-compatible output for mobile |
+| **Vite plugin** | Framework | Medium | Vite plugin with HMR support |
+| **VS Code extension** | DX | Medium | Sync from editor command palette |
+
+### 📋 Backlog
+
+| Feature | Category | Effort | Description |
+|---------|----------|--------|-------------|
+| CSS Modules | Output | Small | Scoped CSS module files |
+| Swift/Kotlin | Output | Medium | Native mobile platform constants |
+| Android XML | Output | Small | Android resource XML format |
+| Next.js plugin | Framework | Medium | Build-time theme generation |
+| Nuxt module | Framework | Medium | Vue project integration |
+| Astro integration | Framework | Small | Astro integration |
+| Figma plugin | DX | Large | Export directly from Figma UI |
+| Adobe XD | Input | Medium | Adobe XD design tokens |
+| Sketch | Input | Medium | Sketch document colors/styles |
+| Migration helpers | Tooling | Small | Upgrade paths between versions |
+
+## Completed Features
+
+### Token Types ✅
+- [x] Typography composites - Full text style tokens
+- [x] Shadow tokens - Box shadow and drop shadow
+- [x] Gradient tokens - Linear, radial, and conic
+- [x] Border tokens - Width, style, and composites
+- [x] Animation tokens - Keyframes and sequences
+
+### Output Adapters ✅
+- [x] Tailwind CSS v4 - `@theme` with OKLCH/hex
+- [x] Ionic Framework - CSS custom properties
+- [x] SCSS/Sass - Variables, maps, and mixins
+
+### Developer Experience ✅
+- [x] CLI tool - `npx figma-to sync`
+- [x] Token linting - 8 built-in rules
+- [x] Diff output - Show changes between syncs
+- [x] Dry run mode - Preview without writing
+- [x] GitHub Actions - CI/CD with test workflow (release auth scope pending)
+
+## Future Exploration
 
 ### Claude Agent SDK Integration
+- **SCSS Agent** - Claude agent for SCSS output
+- **React Native Agent** - Mobile StyleSheet generation
+- **CSS-in-JS Agent** - styled-components/Emotion output
+- **Multi-platform Agent** - Single agent, multiple formats
 
-- [ ] **SCSS Agent** - Claude agent that generates SCSS output from Figma tokens
-- [ ] **React Native Agent** - Agent for mobile StyleSheet generation
-- [ ] **CSS-in-JS Agent** - Agent for styled-components/Emotion output
-- [ ] **Multi-platform Agent** - Single agent that outputs to multiple formats
-
-### Framework Integrations
-
-- [ ] **Next.js** - Plugin for automatic theme generation at build time
-- [ ] **Vite** - Vite plugin with HMR support
-- [ ] **Nuxt** - Nuxt module for Vue projects
-- [ ] **Astro** - Astro integration
-
-### Token Types
-
-- [x] **Typography composites** - Full text style tokens (font, size, weight, line-height)
-- [x] **Shadow tokens** - Box shadow and drop shadow support
-- [x] **Gradient tokens** - Linear, radial, and conic gradient support
-- [x] **Border tokens** - Border width, style, and composite borders
-- [x] **Animation tokens** - Keyframe and animation sequence tokens
-
-### Developer Experience
-
-- [x] **CLI tool** - `npx figma-to sync` command
-- [ ] **Watch mode** - Auto-regenerate on Figma webhook events
-- [ ] **Figma plugin** - Export directly from Figma UI
-- [ ] **VS Code extension** - Sync from editor command palette
-- [ ] **GitHub Action** - CI/CD integration for automated PRs
-
-### Validation & Tooling
-
-- [x] **Token linting** - Warn on naming inconsistencies
-- [x] **Diff output** - Show what changed between syncs
-- [x] **Dry run mode** - Preview output without writing files
-- [ ] **Migration helpers** - Upgrade paths between major versions
+### Bidirectional Sync (Code → Figma)
+The **Figma Output Adapter** would enable:
+- Parse CSS/SCSS files to extract token values
+- Push color, spacing, and typography changes back to Figma
+- Two-way sync for design-development collaboration
+- Conflict detection and resolution strategies
 
 ## Contributing
 
