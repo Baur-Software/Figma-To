@@ -13,7 +13,7 @@ This document outlines planned features and improvements for `@baur-software/fig
 - **CLI tool** - `figma-to sync` command for quick token generation
 - **SCSS/Sass output** - Variables, maps, and mixins
 - **TokenTypeRegistry** - Extensible architecture for adding new token types (Open/Closed principle)
-- **Token linting** - 8 built-in rules for naming, values, and structure validation
+- **Token linting** - 19 built-in rules with dotfile config and presets
 
 ## Priority Features
 
@@ -66,10 +66,17 @@ This document outlines planned features and improvements for `@baur-software/fig
 
 ### Developer Experience ✅
 - [x] CLI tool - `npx figma-to sync`
-- [x] Token linting - 8 built-in rules
 - [x] Diff output - Show changes between syncs
 - [x] Dry run mode - Preview without writing
 - [x] GitHub Actions - CI/CD with test workflow (release auth scope pending)
+
+### Token Linting ✅
+- [x] 19 built-in rules covering naming, values, structure, and references
+- [x] Dotfile config (`.figmatorc`, `figma-to.config.js`, package.json)
+- [x] Built-in presets: `recommended`, `strict`, `minimal`
+- [x] Type validation: color, dimension, typography, shadow, gradient, border, cubic-bezier
+- [x] Structural checks: circular references, mode consistency, broken references
+- [x] Figma-specific: hidden from publishing detection
 
 ## Future Exploration
 
