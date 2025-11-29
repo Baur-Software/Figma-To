@@ -35,3 +35,25 @@ export {
   variableToPath,
   tokensToGroup,
 } from './css/parser.js';
+
+// SCSS Input Adapter
+export {
+  SCSSAdapter,
+  createSCSSAdapter,
+  type SCSSInput,
+  type SCSSParseOptions,
+  type ParsedScssVariable,
+  type ParsedScssMap,
+  type DetectedScssToken,
+} from './scss/index.js';
+
+export {
+  extractScssVariables,
+  extractScssMaps,
+  parseScssVariables,
+  parseScssMap,
+  scssVariableToPath,
+  resolveScssReference,
+  scssTokensToGroup,
+  extractAllScssTokens,
+} from './scss/parser.js';

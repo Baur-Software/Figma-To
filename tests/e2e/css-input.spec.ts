@@ -13,7 +13,7 @@ import {
   parseFontFamily,
   variableToPath,
   tokensToGroup,
-} from '../../src/adapters/input/css/index.js';
+} from '../../dist/adapters/input/css/index.js';
 
 // =============================================================================
 // Test CSS Fixtures
