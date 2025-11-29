@@ -536,4 +536,334 @@ test.describe('Transformation Report Builder', () => {
 
     expect(report.sourceCheck.isSameFile).toBe(true);
   });
+
+  test('tracks style counts', () => {
+    const report = new TransformationReportBuilder();
+
+    report.addStyle('text');
+    report.addStyle('text');
+    report.addStyle('effect');
+    report.addStyle('paint');
+    report.addStyle('paint');
+    report.addStyle('paint');
+
+    expect(report.stats.textStylesCreated).toBe(2);
+    expect(report.stats.effectStylesCreated).toBe(1);
+    expect(report.stats.paintStylesCreated).toBe(3);
+  });
+});
+
+// =============================================================================
+// Styles Transformer Tests
+// =============================================================================
+
+import {
+  typographyToTextStyle,
+  shadowToEffectStyle,
+  gradientToPaintStyle,
+  extractStyleTokens,
+} from '../../src/adapters/output/figma/index.js';
+
+test.describe('Styles Transformer', () => {
+  test.describe('Typography to Text Style', () => {
+    test('converts basic typography token', () => {
+      const style = typographyToTextStyle('heading/h1', {
+        fontFamily: ['Inter', 'sans-serif'],
+        fontSize: { value: 32, unit: 'px' },
+        fontWeight: 700,
+        lineHeight: 1.2,
+      });
+
+      expect(style.name).toBe('heading/h1');
+      expect(style.fontFamily).toBe('Inter');
+      expect(style.fontSize).toBe(32);
+      expect(style.fontWeight).toBe(700);
+      expect(style.lineHeight).toEqual({ unit: 'PERCENT', value: 120 });
+    });
+
+    test('includes description when provided', () => {
+      const style = typographyToTextStyle(
+        'body/default',
+        {
+          fontFamily: ['Roboto'],
+          fontSize: { value: 16, unit: 'px' },
+          fontWeight: 400,
+          lineHeight: 1.5,
+        },
+        'Default body text style'
+      );
+
+      expect(style.description).toBe('Default body text style');
+    });
+
+    test('converts pixel line height', () => {
+      const style = typographyToTextStyle('fixed', {
+        fontFamily: ['Mono'],
+        fontSize: { value: 14, unit: 'px' },
+        fontWeight: 400,
+        lineHeight: { value: 20, unit: 'px' },
+      });
+
+      expect(style.lineHeight).toEqual({ unit: 'PIXELS', value: 20 });
+    });
+
+    test('converts letter spacing', () => {
+      const style = typographyToTextStyle('tight', {
+        fontFamily: ['Inter'],
+        fontSize: { value: 16, unit: 'px' },
+        fontWeight: 400,
+        lineHeight: 1.5,
+        letterSpacing: { value: -0.5, unit: 'px' },
+      });
+
+      expect(style.letterSpacing).toEqual({ unit: 'PIXELS', value: -0.5 });
+    });
+
+    test('converts text transform to text case', () => {
+      const uppercase = typographyToTextStyle('caps', {
+        fontFamily: ['Inter'],
+        fontSize: { value: 12, unit: 'px' },
+        fontWeight: 500,
+        lineHeight: 1,
+        textTransform: 'uppercase',
+      });
+
+      expect(uppercase.textCase).toBe('UPPER');
+    });
+
+    test('converts font weight keywords', () => {
+      const style = typographyToTextStyle('bold', {
+        fontFamily: ['Inter'],
+        fontSize: { value: 16, unit: 'px' },
+        fontWeight: 'bold',
+        lineHeight: 1.5,
+      });
+
+      expect(style.fontWeight).toBe(700);
+    });
+  });
+
+  test.describe('Shadow to Effect Style', () => {
+    test('converts single shadow', () => {
+      const style = shadowToEffectStyle('shadow/md', {
+        offsetX: { value: 0, unit: 'px' },
+        offsetY: { value: 4, unit: 'px' },
+        blur: { value: 8, unit: 'px' },
+        spread: { value: 0, unit: 'px' },
+        color: { r: 0, g: 0, b: 0, a: 0.1 },
+      });
+
+      expect(style.name).toBe('shadow/md');
+      expect(style.effects).toHaveLength(1);
+      expect(style.effects[0].type).toBe('DROP_SHADOW');
+      expect(style.effects[0].offset).toEqual({ x: 0, y: 4 });
+      expect(style.effects[0].radius).toBe(8);
+    });
+
+    test('converts multiple shadows', () => {
+      const style = shadowToEffectStyle('shadow/layered', [
+        {
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 2, unit: 'px' },
+          blur: { value: 4, unit: 'px' },
+          color: { r: 0, g: 0, b: 0, a: 0.1 },
+        },
+        {
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 8, unit: 'px' },
+          blur: { value: 16, unit: 'px' },
+          color: { r: 0, g: 0, b: 0, a: 0.15 },
+        },
+      ]);
+
+      expect(style.effects).toHaveLength(2);
+    });
+
+    test('converts inset shadow to inner shadow', () => {
+      const style = shadowToEffectStyle('shadow/inset', {
+        offsetX: { value: 0, unit: 'px' },
+        offsetY: { value: 2, unit: 'px' },
+        blur: { value: 4, unit: 'px' },
+        color: { r: 0, g: 0, b: 0, a: 0.1 },
+        inset: true,
+      });
+
+      expect(style.effects[0].type).toBe('INNER_SHADOW');
+    });
+
+    test('includes description when provided', () => {
+      const style = shadowToEffectStyle(
+        'shadow/card',
+        {
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 4, unit: 'px' },
+          blur: { value: 8, unit: 'px' },
+          color: { r: 0, g: 0, b: 0, a: 0.1 },
+        },
+        'Card shadow effect'
+      );
+
+      expect(style.description).toBe('Card shadow effect');
+    });
+  });
+
+  test.describe('Gradient to Paint Style', () => {
+    test('converts linear gradient', () => {
+      const style = gradientToPaintStyle('gradient/primary', {
+        type: 'linear',
+        angle: 90,
+        stops: [
+          { color: { r: 0, g: 0.5, b: 1, a: 1 }, position: 0 },
+          { color: { r: 0.5, g: 0, b: 1, a: 1 }, position: 1 },
+        ],
+      });
+
+      expect(style.name).toBe('gradient/primary');
+      expect(style.paints).toHaveLength(1);
+      expect(style.paints[0].type).toBe('GRADIENT_LINEAR');
+      expect(style.paints[0].gradientStops).toHaveLength(2);
+    });
+
+    test('converts radial gradient', () => {
+      const style = gradientToPaintStyle('gradient/radial', {
+        type: 'radial',
+        stops: [
+          { color: { r: 1, g: 1, b: 1, a: 1 }, position: 0 },
+          { color: { r: 0, g: 0, b: 0, a: 1 }, position: 1 },
+        ],
+      });
+
+      expect(style.paints[0].type).toBe('GRADIENT_RADIAL');
+    });
+
+    test('converts conic gradient to angular', () => {
+      const style = gradientToPaintStyle('gradient/conic', {
+        type: 'conic',
+        stops: [
+          { color: { r: 1, g: 0, b: 0, a: 1 }, position: 0 },
+          { color: { r: 0, g: 1, b: 0, a: 1 }, position: 0.33 },
+          { color: { r: 0, g: 0, b: 1, a: 1 }, position: 0.66 },
+          { color: { r: 1, g: 0, b: 0, a: 1 }, position: 1 },
+        ],
+      });
+
+      expect(style.paints[0].type).toBe('GRADIENT_ANGULAR');
+    });
+
+    test('includes gradient handle positions', () => {
+      const style = gradientToPaintStyle('gradient/test', {
+        type: 'linear',
+        angle: 180,
+        stops: [
+          { color: { r: 0, g: 0, b: 0, a: 1 }, position: 0 },
+          { color: { r: 1, g: 1, b: 1, a: 1 }, position: 1 },
+        ],
+      });
+
+      expect(style.paints[0].gradientHandlePositions).toHaveLength(3);
+    });
+  });
+
+  test.describe('Extract Style Tokens', () => {
+    test('extracts typography tokens', () => {
+      const theme: ThemeFile = {
+        name: 'Test',
+        collections: [{
+          name: 'styles',
+          modes: ['default'],
+          defaultMode: 'default',
+          tokens: {
+            default: {
+              typography: {
+                heading: {
+                  $type: 'typography',
+                  $value: {
+                    fontFamily: ['Inter'],
+                    fontSize: { value: 24, unit: 'px' },
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                  },
+                },
+              },
+            },
+          },
+        }],
+      };
+
+      const report = new TransformationReportBuilder();
+      const result = extractStyleTokens(theme, report);
+
+      expect(result.textStyles).toHaveLength(1);
+      expect(result.textStyles[0].style.name).toBe('typography/heading');
+      expect(report.stats.textStylesCreated).toBe(1);
+    });
+
+    test('extracts shadow tokens', () => {
+      const theme: ThemeFile = {
+        name: 'Test',
+        collections: [{
+          name: 'effects',
+          modes: ['default'],
+          defaultMode: 'default',
+          tokens: {
+            default: {
+              shadow: {
+                sm: {
+                  $type: 'shadow',
+                  $value: {
+                    offsetX: { value: 0, unit: 'px' },
+                    offsetY: { value: 1, unit: 'px' },
+                    blur: { value: 2, unit: 'px' },
+                    color: { r: 0, g: 0, b: 0, a: 0.1 },
+                  },
+                },
+              },
+            },
+          },
+        }],
+      };
+
+      const report = new TransformationReportBuilder();
+      const result = extractStyleTokens(theme, report);
+
+      expect(result.effectStyles).toHaveLength(1);
+      expect(result.effectStyles[0].style.name).toBe('shadow/sm');
+      expect(report.stats.effectStylesCreated).toBe(1);
+    });
+
+    test('extracts gradient tokens', () => {
+      const theme: ThemeFile = {
+        name: 'Test',
+        collections: [{
+          name: 'gradients',
+          modes: ['default'],
+          defaultMode: 'default',
+          tokens: {
+            default: {
+              gradient: {
+                sunset: {
+                  $type: 'gradient',
+                  $value: {
+                    type: 'linear',
+                    angle: 135,
+                    stops: [
+                      { color: { r: 1, g: 0.5, b: 0, a: 1 }, position: 0 },
+                      { color: { r: 1, g: 0, b: 0.5, a: 1 }, position: 1 },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        }],
+      };
+
+      const report = new TransformationReportBuilder();
+      const result = extractStyleTokens(theme, report);
+
+      expect(result.paintStyles).toHaveLength(1);
+      expect(result.paintStyles[0].style.name).toBe('gradient/sunset');
+      expect(report.stats.paintStylesCreated).toBe(1);
+    });
+  });
 });

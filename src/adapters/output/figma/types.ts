@@ -137,6 +137,9 @@ export interface TransformationStats {
   modesCreated: number;
   variablesCreated: number;
   valuesSet: number;
+  textStylesCreated: number;
+  effectStylesCreated: number;
+  paintStylesCreated: number;
   skipped: number;
   warnings: number;
 }
@@ -162,6 +165,102 @@ export interface TransformationReport {
 }
 
 // =============================================================================
+// Figma Style Types
+// =============================================================================
+
+/**
+ * Figma RGBA color (0-1 range)
+ */
+export interface FigmaRGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+/**
+ * Figma line height
+ */
+export interface FigmaLineHeight {
+  unit: 'PIXELS' | 'PERCENT' | 'AUTO';
+  value?: number;
+}
+
+/**
+ * Figma letter spacing
+ */
+export interface FigmaLetterSpacing {
+  unit: 'PIXELS' | 'PERCENT';
+  value: number;
+}
+
+/**
+ * Figma text style definition
+ */
+export interface FigmaTextStyle {
+  name: string;
+  description?: string;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  lineHeight?: FigmaLineHeight;
+  letterSpacing?: FigmaLetterSpacing;
+  textCase?: 'ORIGINAL' | 'UPPER' | 'LOWER' | 'TITLE';
+  textDecoration?: 'NONE' | 'UNDERLINE' | 'STRIKETHROUGH';
+}
+
+/**
+ * Figma effect (shadow, blur, etc.)
+ */
+export interface FigmaEffect {
+  type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' | 'BACKGROUND_BLUR';
+  visible: boolean;
+  blendMode: string;
+  color?: FigmaRGBA;
+  offset?: { x: number; y: number };
+  radius?: number;
+  spread?: number;
+}
+
+/**
+ * Figma effect style definition
+ */
+export interface FigmaEffectStyle {
+  name: string;
+  description?: string;
+  effects: FigmaEffect[];
+}
+
+/**
+ * Figma gradient stop
+ */
+export interface FigmaGradientStop {
+  color: FigmaRGBA;
+  position: number;
+}
+
+/**
+ * Figma paint (solid, gradient, etc.)
+ */
+export interface FigmaPaint {
+  type: 'SOLID' | 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR' | 'GRADIENT_DIAMOND' | 'IMAGE';
+  visible: boolean;
+  blendMode: string;
+  color?: FigmaRGBA;
+  gradientStops?: FigmaGradientStop[];
+  gradientHandlePositions?: Array<{ x: number; y: number }>;
+}
+
+/**
+ * Figma paint style definition
+ */
+export interface FigmaPaintStyle {
+  name: string;
+  description?: string;
+  paints: FigmaPaint[];
+}
+
+// =============================================================================
 // Write Client Types
 // =============================================================================
 
@@ -176,6 +275,33 @@ export interface PluginVariableParams {
   valuesByMode: Record<string, unknown>;
   description?: string;
   scopes?: string[];
+}
+
+/**
+ * Parameters for creating/updating text styles via Plugin API
+ */
+export interface PluginTextStyleParams {
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  id?: string;
+  style: FigmaTextStyle;
+}
+
+/**
+ * Parameters for creating/updating effect styles via Plugin API
+ */
+export interface PluginEffectStyleParams {
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  id?: string;
+  style: FigmaEffectStyle;
+}
+
+/**
+ * Parameters for creating/updating paint styles via Plugin API
+ */
+export interface PluginPaintStyleParams {
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  id?: string;
+  style: FigmaPaintStyle;
 }
 
 /**

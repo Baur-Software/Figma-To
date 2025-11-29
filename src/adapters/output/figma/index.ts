@@ -12,6 +12,14 @@ export { FigmaOutputAdapter, createFigmaOutputAdapter } from './adapter.js';
 export { transformToFigmaVariables, resetIdCounter } from './transformer.js';
 export type { TransformResult } from './transformer.js';
 
+// Styles Transformer
+export {
+  typographyToTextStyle,
+  shadowToEffectStyle,
+  gradientToPaintStyle,
+  extractStyleTokens,
+} from './styles-transformer.js';
+
 // Report
 export { TransformationReportBuilder, createReport } from './report.js';
 
@@ -30,8 +38,20 @@ export type {
   WarningCode,
   PluginVariableParams,
   PluginStyleParams,
+  PluginTextStyleParams,
+  PluginEffectStyleParams,
+  PluginPaintStyleParams,
   PluginStatus,
   WriteServerClient,
+  FigmaRGBA,
+  FigmaTextStyle,
+  FigmaEffectStyle,
+  FigmaPaintStyle,
+  FigmaEffect,
+  FigmaPaint,
+  FigmaGradientStop,
+  FigmaLineHeight,
+  FigmaLetterSpacing,
 } from './types.js';
 
 export { SourceOverwriteError, PluginNotConnectedError } from './types.js';

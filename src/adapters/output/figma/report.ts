@@ -24,6 +24,9 @@ export class TransformationReportBuilder implements TransformationReport {
     modesCreated: 0,
     variablesCreated: 0,
     valuesSet: 0,
+    textStylesCreated: 0,
+    effectStylesCreated: 0,
+    paintStylesCreated: 0,
     skipped: 0,
     warnings: 0,
   };
@@ -61,6 +64,23 @@ export class TransformationReportBuilder implements TransformationReport {
    */
   addValue(): void {
     this.stats.valuesSet++;
+  }
+
+  /**
+   * Record a created style
+   */
+  addStyle(type: 'text' | 'effect' | 'paint'): void {
+    switch (type) {
+      case 'text':
+        this.stats.textStylesCreated++;
+        break;
+      case 'effect':
+        this.stats.effectStylesCreated++;
+        break;
+      case 'paint':
+        this.stats.paintStylesCreated++;
+        break;
+    }
   }
 
   /**
@@ -115,6 +135,14 @@ export class TransformationReportBuilder implements TransformationReport {
     lines.push(`  Modes: ${this.stats.modesCreated}`);
     lines.push(`  Variables: ${this.stats.variablesCreated}`);
     lines.push(`  Values Set: ${this.stats.valuesSet}`);
+
+    const totalStyles = this.stats.textStylesCreated + this.stats.effectStylesCreated + this.stats.paintStylesCreated;
+    if (totalStyles > 0) {
+      lines.push(`  Text Styles: ${this.stats.textStylesCreated}`);
+      lines.push(`  Effect Styles: ${this.stats.effectStylesCreated}`);
+      lines.push(`  Paint Styles: ${this.stats.paintStylesCreated}`);
+    }
+
     lines.push(`  Skipped: ${this.stats.skipped}`);
     lines.push(`  Warnings: ${this.stats.warnings}`);
 
