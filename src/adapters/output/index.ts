@@ -28,3 +28,30 @@ export {
   type ScssOutput,
   type ScssAdapterOptions,
 } from './scss/index.js';
+
+// Figma Output Adapter
+export {
+  FigmaOutputAdapter,
+  createFigmaOutputAdapter,
+  transformToFigmaVariables,
+  resetIdCounter,
+  TransformationReportBuilder,
+  createReport,
+  checkSourceSafety,
+  checkPluginSafety,
+  SourceOverwriteError,
+  PluginNotConnectedError,
+  type TransformResult,
+  type FigmaOutputAdapterOptions,
+  type FigmaOutputResult,
+  type TransformationReport,
+  type TransformationStats,
+  type TransformationWarning,
+  type SkippedToken,
+  type SourceCheckResult,
+  type WarningCode,
+  type PluginVariableParams,
+  type PluginStyleParams,
+  type PluginStatus,
+  type WriteServerClient,
+} from './figma/index.js';
