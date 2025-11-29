@@ -34,9 +34,15 @@ export interface LintResult {
   passed: boolean;
 }
 
+/** Input for reporting a lint message (severity is optional, uses rule default) */
+export type LintReportInput = Omit<LintMessage, 'rule' | 'severity'> & {
+  /** Override severity (optional, defaults to rule's configured severity) */
+  severity?: LintSeverity;
+};
+
 export interface LintRuleContext {
   /** Report a lint message */
-  report(message: Omit<LintMessage, 'rule'>): void;
+  report(message: LintReportInput): void;
 }
 
 export interface LintRule {

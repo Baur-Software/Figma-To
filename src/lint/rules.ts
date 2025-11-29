@@ -97,7 +97,6 @@ export const inconsistentNaming: LintRule = {
           .join('; ');
 
         context.report({
-          severity: 'warning',
           message: `Mixed naming conventions in collection "${collection.name}": ${conventionList}`,
           collection: collection.name,
           suggestion: 'Use consistent kebab-case naming throughout',
@@ -122,7 +121,6 @@ export const missingDescription: LintRule = {
         walkTokens(tokens as Record<string, unknown>, (token, path) => {
           if (!token.$description) {
             context.report({
-              severity: 'info',
               message: `Token missing description`,
               path: path.join('.'),
               collection: `${collection.name}/${mode}`,
@@ -160,7 +158,6 @@ export const duplicateValues: LintRule = {
         for (const [, paths] of valueMap.entries()) {
           if (paths.length > 1) {
             context.report({
-              severity: 'info',
               message: `Duplicate values found: ${paths.join(', ')}`,
               collection: `${collection.name}/${mode}`,
               suggestion: 'Consider using token references to avoid duplication',
@@ -196,7 +193,6 @@ export const invalidColorValue: LintRule = {
 
             if (!isValid(color.r) || !isValid(color.g) || !isValid(color.b)) {
               context.report({
-                severity: 'error',
                 message: `Invalid color value: RGB values must be between 0 and 1`,
                 path: path.join('.'),
                 collection: `${collection.name}/${mode}`,
@@ -205,7 +201,6 @@ export const invalidColorValue: LintRule = {
 
             if (color.a !== undefined && !isValid(color.a)) {
               context.report({
-                severity: 'error',
                 message: `Invalid alpha value: must be between 0 and 1`,
                 path: path.join('.'),
                 collection: `${collection.name}/${mode}`,
@@ -235,7 +230,6 @@ export const deepNesting: LintRule = {
         walkTokens(tokens as Record<string, unknown>, (_, path) => {
           if (path.length > maxDepth) {
             context.report({
-              severity: 'warning',
               message: `Token path too deep (${path.length} levels): ${path.join('.')}`,
               path: path.join('.'),
               collection: `${collection.name}/${mode}`,
@@ -265,7 +259,6 @@ export const invalidTokenName: LintRule = {
             // Check for starting with number (not valid CSS custom property)
             if (/^\d/.test(segment)) {
               context.report({
-                severity: 'error',
                 message: `Token name "${segment}" starts with a number`,
                 path: path.join('.'),
                 collection: `${collection.name}/${mode}`,
@@ -276,7 +269,6 @@ export const invalidTokenName: LintRule = {
             // Check for special characters
             if (/[^a-zA-Z0-9\-_]/.test(segment)) {
               context.report({
-                severity: 'error',
                 message: `Token name "${segment}" contains invalid characters`,
                 path: path.join('.'),
                 collection: `${collection.name}/${mode}`,
@@ -312,7 +304,6 @@ export const emptyCollection: LintRule = {
 
       if (!hasTokens) {
         context.report({
-          severity: 'warning',
           message: `Collection "${collection.name}" has no tokens`,
           collection: collection.name,
           suggestion: 'Remove empty collections or add tokens',
@@ -354,7 +345,6 @@ export const brokenReference: LintRule = {
 
             if (!allPaths.has(cleanRef)) {
               context.report({
-                severity: 'error',
                 message: `Broken reference: "${ref}" not found`,
                 path: path.join('.'),
                 collection: `${collection.name}/${mode}`,
