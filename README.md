@@ -17,6 +17,14 @@ This library bridges **Figma's MCP server** and **REST API** with your frontend 
   - **Ionic Framework** (CSS custom properties with color variants)
   - **SolidJS / Capacitor** applications
 
+- **Figma** - Push design tokens back to Figma:
+  - Variables (colors, dimensions, strings, booleans)
+  - Text Styles (typography tokens)
+  - Effect Styles (shadows)
+  - Paint Styles (gradients)
+
+- **SCSS** - Generate SCSS partials with variables, maps, and mixins
+
 ## Why This Library?
 
 **Keep your design and code in sync automatically.**
@@ -340,6 +348,110 @@ import type {
   TailwindThemeOutput,
   IonicTheme,
 } from '@baur-software/figma-to';
+```
+
+## Pushing Tokens Back to Figma
+
+The Figma output adapter lets you push normalized design tokens back to Figma as Variables and Styles. This enables bidirectional sync - you can read tokens from one Figma file and push them to another.
+
+### Using the Figma MCP Write Server (Recommended)
+
+The easiest way to push tokens to Figma is via the [figma-mcp-write-server](https://github.com/anthropics/figma-mcp-write-server), which provides Plugin API access without requiring Figma Enterprise.
+
+**Setup:**
+
+1. Install and run the write server:
+   ```bash
+   npx figma-mcp-write-server
+   ```
+
+2. Open Figma Desktop and activate the write-server plugin (Dev Mode → Plugins → figma-mcp-write-server)
+
+3. Use the adapter in your code:
+   ```typescript
+   import {
+     parseTheme,
+     createFigmaOutputAdapter,
+     tryConnectWriteServer,
+   } from '@baur-software/figma-to';
+
+   // Parse tokens from source
+   const theme = await parseTheme({ variablesResponse });
+
+   // Connect to write server
+   const writeClient = await tryConnectWriteServer();
+   if (!writeClient) {
+     console.error('Figma plugin not connected');
+     return;
+   }
+
+   // Create adapter with write client
+   const adapter = createFigmaOutputAdapter(writeClient);
+   const result = await adapter.transform(theme, {
+     targetFileKey: 'target-file-key',
+   });
+
+   // Push to Figma
+   await result.execute();
+
+   console.log(result.report.toString());
+   // Output:
+   // Transformation Report
+   // =====================
+   // Collections: 2 created
+   // Variables: 45 created
+   // Text Styles: 8 created
+   // Effect Styles: 3 created
+   ```
+
+### Using the REST API (Enterprise)
+
+If you have Figma Enterprise with `file_variables:write` scope:
+
+```typescript
+import { parseTheme, createFigmaOutputAdapter } from '@baur-software/figma-to';
+
+const theme = await parseTheme({ variablesResponse });
+const adapter = createFigmaOutputAdapter();
+
+const result = await adapter.transform(theme, {
+  targetFileKey: 'your-file-key',
+});
+
+// Get the REST API request body
+console.log(JSON.stringify(result.requestBody, null, 2));
+
+// Or get manual instructions
+console.log(result.getManualInstructions());
+```
+
+### What Gets Pushed
+
+| Token Type | Figma Output |
+|------------|--------------|
+| `color` | Variable (COLOR) |
+| `dimension` | Variable (FLOAT) |
+| `string` | Variable (STRING) |
+| `boolean` | Variable (BOOLEAN) |
+| `typography` | Text Style |
+| `shadow` | Effect Style |
+| `gradient` | Paint Style |
+
+### Safety Checks
+
+The adapter includes safety checks to prevent accidental overwrites:
+
+```typescript
+// This will throw SourceOverwriteError
+const result = await adapter.transform(theme, {
+  targetFileKey: theme.meta.figmaFileKey, // Same as source!
+});
+
+// Explicitly allow overwriting
+const result = await adapter.transform(theme, {
+  targetFileKey: theme.meta.figmaFileKey,
+  allowSourceOverwrite: true,
+});
 ```
 
 ## Integration with Ionic + SolidJS + Capacitor
