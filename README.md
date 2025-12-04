@@ -356,7 +356,7 @@ The Figma output adapter lets you push normalized design tokens back to Figma as
 
 ### Using the Figma MCP Write Server (Recommended)
 
-The easiest way to push tokens to Figma is via the [figma-mcp-write-server](https://github.com/anthropics/figma-mcp-write-server), which provides Plugin API access without requiring Figma Enterprise.
+The easiest way to push tokens to Figma is via the [figma-mcp-write-server](https://github.com/oO/figma-mcp-write-server), which provides Plugin API access without requiring Figma Enterprise.
 
 **Setup:**
 
@@ -368,6 +368,7 @@ The easiest way to push tokens to Figma is via the [figma-mcp-write-server](http
 2. Open Figma Desktop and activate the write-server plugin (Dev Mode → Plugins → figma-mcp-write-server)
 
 3. Use the adapter in your code:
+
    ```typescript
    import {
      parseTheme,

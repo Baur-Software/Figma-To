@@ -2,7 +2,7 @@
 
 This document outlines planned features and improvements for `@baur-software/figma-to`.
 
-## Current Status (v0.4.0)
+## Current Status (v0.5.0)
 
 - Figma REST API and MCP server input support
 - **MCP variable defs** - Direct support for `get_variable_defs` output including `Font()` and `Effect()` strings
@@ -10,10 +10,12 @@ This document outlines planned features and improvements for `@baur-software/fig
 - Ionic Framework CSS custom properties with full color variants
 - Light/dark mode support from Figma variable modes
 - W3C DTCG-aligned normalized token schema
-- **CLI tool** - `figma-to sync` command for quick token generation
+- **CLI tool** - `figma-to sync` and `figma-to push` commands
 - **SCSS/Sass output** - Variables, maps, and mixins
 - **TokenTypeRegistry** - Extensible architecture for adding new token types (Open/Closed principle)
 - **Token linting** - 19 built-in rules with dotfile config and presets
+- **Bidirectional sync** - Push tokens back to Figma via figma-mcp-write-server
+- **CSS/SCSS input** - Parse existing CSS variables and SCSS $variables/maps
 
 ## Priority Features
 
@@ -21,7 +23,6 @@ This document outlines planned features and improvements for `@baur-software/fig
 
 | Feature | Category | Effort | Description |
 |---------|----------|--------|-------------|
-| **Figma Output Adapter** | Bidirectional | Large | Push code changes back to Figma (code → Figma sync) |
 | **CSS-in-JS** | Output | Medium | styled-components, Emotion, vanilla-extract objects |
 | **Watch mode** | DX | Medium | Auto-regenerate on Figma webhook events |
 
@@ -60,15 +61,23 @@ This document outlines planned features and improvements for `@baur-software/fig
 - [x] Border tokens - Width, style, and composites
 - [x] Animation tokens - Keyframes and sequences
 
+### Input Adapters ✅
+
+- [x] Figma REST API - Direct Figma file access
+- [x] Figma MCP Server - `get_variable_defs` integration
+- [x] CSS Input - Parse CSS custom properties (`--var: value`)
+- [x] SCSS Input - Parse `$variables` and Sass maps
+
 ### Output Adapters ✅
 
 - [x] Tailwind CSS v4 - `@theme` with OKLCH/hex
 - [x] Ionic Framework - CSS custom properties
 - [x] SCSS/Sass - Variables, maps, and mixins
+- [x] Figma Output - Push tokens to Figma via figma-mcp-write-server
 
 ### Developer Experience ✅
 
-- [x] CLI tool - `npx figma-to sync`
+- [x] CLI tool - `npx figma-to sync` and `npx figma-to push`
 - [x] Diff output - Show changes between syncs
 - [x] Dry run mode - Preview without writing
 - [x] GitHub Actions - CI/CD with test workflow (release auth scope pending)
@@ -91,14 +100,14 @@ This document outlines planned features and improvements for `@baur-software/fig
 - **CSS-in-JS Agent** - styled-components/Emotion output
 - **Multi-platform Agent** - Single agent, multiple formats
 
-### Bidirectional Sync (Code → Figma)
+### Advanced Bidirectional Sync
 
-The **Figma Output Adapter** would enable:
+Building on the Figma Output Adapter (v0.5.0), future enhancements could include:
 
-- Parse CSS/SCSS files to extract token values
-- Push color, spacing, and typography changes back to Figma
-- Two-way sync for design-development collaboration
 - Conflict detection and resolution strategies
+- Automatic sync triggers on file save
+- Version history and rollback support
+- Team collaboration workflows
 
 ## Contributing
 
