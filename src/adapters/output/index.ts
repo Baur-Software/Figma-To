@@ -29,6 +29,28 @@ export {
   type ScssAdapterOptions,
 } from './scss/index.js';
 
+// Next.js Output Adapter
+export {
+  NextJsAdapter,
+  createNextJsAdapter,
+  generateNextJsCss,
+  generateTypeScript,
+  withFigmaToTheme,
+  generateTheme,
+  syncTheme,
+  type NextJsOutput,
+  type NextJsAdapterOptions,
+  type NextJsTailwindConfig,
+  type NextJsGeneratorOptions,
+  type NextJsCssOutput,
+  type CssVariable,
+  type TypeScriptGeneratorOptions,
+  type TypeScriptOutput,
+  type FigmaToNextJsOptions,
+  type GeneratedThemeOutput,
+  type NextConfigWithFigmaTo,
+} from './nextjs/index.js';
+
 // Figma Output Adapter
 export {
   FigmaOutputAdapter,

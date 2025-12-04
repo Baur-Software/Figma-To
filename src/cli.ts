@@ -4,6 +4,7 @@ import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import {
   figmaToTailwind,
+  figmaToNextJs,
   parseTheme,
   lintTheme,
   loadConfig,
@@ -44,11 +45,14 @@ Sync Options:
   --file-key <key>            Figma file key (required, or set FIGMA_FILE_KEY)
   --token <token>             Figma API token (required, or set FIGMA_TOKEN)
   --out <dir>                 Output directory (default: ./theme)
-  --format <hex|oklch>        Color format (default: oklch)
+  --output <format>           Output format: tailwind (default), nextjs, scss
+  --format <hex|oklch>        Color format (default: oklch for tailwind, hex for nextjs)
   --framework <name>          Framework: solidjs, react, vue, angular
   --dry-run                   Preview output without writing files
   --diff                      Show what would change (implies --dry-run)
   --lint                      Run linting after sync
+  --types                     Generate TypeScript types (nextjs output only)
+  --constants                 Generate TypeScript constants (nextjs output only)
 
 Push Options:
   --source <file>             Source file (CSS or SCSS)
@@ -163,10 +167,13 @@ async function sync(args: string[]) {
   const fileKey = opts['file-key'] || process.env.FIGMA_FILE_KEY;
   const token = opts['token'] || process.env.FIGMA_TOKEN;
   const outDir = opts['out'] || './theme';
-  const colorFormat = (opts['format'] as 'hex' | 'oklch') || 'oklch';
+  const outputFormat = (opts['output'] as 'tailwind' | 'nextjs' | 'scss') || 'tailwind';
+  const colorFormat = (opts['format'] as 'hex' | 'oklch' | 'rgb' | 'hsl') || (outputFormat === 'nextjs' ? 'hex' : 'oklch');
   const framework = opts['framework'] as 'solidjs' | 'react' | 'vue' | 'angular' | undefined;
   const showDiff = opts['diff'] === 'true';
   const dryRun = opts['dry-run'] === 'true' || showDiff;
+  const generateTypes = opts['types'] !== 'false';
+  const generateConstants = opts['constants'] !== 'false';
 
   if (!fileKey) {
     console.error('Error: --file-key or FIGMA_FILE_KEY is required');
@@ -194,24 +201,56 @@ async function sync(args: string[]) {
 
   const variablesResponse = await response.json() as GetLocalVariablesResponse;
 
-  console.log('Generating theme CSS...');
+  console.log(`Generating theme (${outputFormat} format)...`);
 
-  const output = await figmaToTailwind(
-    { variablesResponse, fileKey },
-    {
-      tailwind: { colorFormat },
-      framework,
-      darkMode: true,
+  let files: Record<string, string> = {};
+
+  if (outputFormat === 'nextjs') {
+    // Generate Next.js output
+    const output = await figmaToNextJs(
+      { variablesResponse, fileKey },
+      {
+        colorFormat: colorFormat as 'hex' | 'rgb' | 'hsl' | 'oklch',
+        generateTypes,
+        generateConstants,
+        generateTailwindConfig: true,
+        darkMode: true,
+      }
+    );
+
+    files = {
+      'theme.css': output.css,
+    };
+    if (output.darkCss) {
+      files['theme-dark.css'] = output.darkCss;
     }
-  );
+    if (output.files['theme.ts']) {
+      files['theme.ts'] = output.files['theme.ts'];
+    }
+    if (output.files['theme.d.ts']) {
+      files['theme.d.ts'] = output.files['theme.d.ts'];
+    }
+    if (output.files['tailwind.config.ts']) {
+      files['tailwind.config.ts'] = output.files['tailwind.config.ts'];
+    }
+  } else {
+    // Generate Tailwind/Ionic output (default)
+    const output = await figmaToTailwind(
+      { variablesResponse, fileKey },
+      {
+        tailwind: { colorFormat: colorFormat as 'hex' | 'oklch' },
+        framework,
+        darkMode: true,
+      }
+    );
 
-  // Prepare files
-  const files: Record<string, string> = {
-    'theme.css': output.css,
-    'tailwind-theme.css': output.files['tailwind-theme.css'] || '',
-    'ionic-theme.css': output.files['ionic-theme.css'] || '',
-    'variables.css': output.files['variables.css'] || '',
-  };
+    files = {
+      'theme.css': output.css,
+      'tailwind-theme.css': output.files['tailwind-theme.css'] || '',
+      'ionic-theme.css': output.files['ionic-theme.css'] || '',
+      'variables.css': output.files['variables.css'] || '',
+    };
+  }
 
   // Filter out empty files
   const filesToWrite = Object.fromEntries(

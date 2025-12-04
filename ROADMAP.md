@@ -43,7 +43,6 @@ This document outlines planned features and improvements for `@baur-software/fig
 | CSS Modules | Output | Small | Scoped CSS module files |
 | Swift/Kotlin | Output | Medium | Native mobile platform constants |
 | Android XML | Output | Small | Android resource XML format |
-| Next.js plugin | Framework | Medium | Build-time theme generation |
 | Nuxt module | Framework | Medium | Vue project integration |
 | Astro integration | Framework | Small | Astro integration |
 | Figma plugin | DX | Large | Export directly from Figma UI |
@@ -74,6 +73,7 @@ This document outlines planned features and improvements for `@baur-software/fig
 - [x] Ionic Framework - CSS custom properties
 - [x] SCSS/Sass - Variables, maps, and mixins
 - [x] Figma Output - Push tokens to Figma via figma-mcp-write-server
+- [x] Next.js - Build-time theme generation with TypeScript types
 
 ### Developer Experience ✅
 

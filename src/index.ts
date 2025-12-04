@@ -54,6 +54,28 @@ export {
   type ScssAdapterOptions,
 } from './adapters/output/scss/index.js';
 
+// Next.js Output Adapter
+export {
+  NextJsAdapter,
+  createNextJsAdapter,
+  generateNextJsCss,
+  generateTypeScript,
+  withFigmaToTheme,
+  generateTheme,
+  syncTheme,
+  type NextJsOutput,
+  type NextJsAdapterOptions,
+  type NextJsTailwindConfig,
+  type NextJsGeneratorOptions,
+  type NextJsCssOutput,
+  type CssVariable,
+  type TypeScriptGeneratorOptions,
+  type TypeScriptOutput,
+  type FigmaToNextJsOptions,
+  type GeneratedThemeOutput,
+  type NextConfigWithFigmaTo,
+} from './adapters/output/nextjs/index.js';
+
 // Figma Output Adapter
 export {
   FigmaOutputAdapter,
@@ -127,6 +149,11 @@ import {
   type ScssAdapterOptions,
   type ScssOutput,
 } from './adapters/output/scss/index.js';
+import {
+  createNextJsAdapter,
+  type NextJsAdapterOptions,
+  type NextJsOutput,
+} from './adapters/output/nextjs/index.js';
 import type { ThemeFile } from './schema/tokens.js';
 
 /**
@@ -196,5 +223,37 @@ export async function generateScssOutput(
   options?: ScssAdapterOptions
 ): Promise<ScssOutput> {
   const adapter = createScssAdapter();
+  return adapter.transform(theme, options);
+}
+
+/**
+ * Quick conversion from Figma data to Next.js theme
+ *
+ * @example
+ * ```typescript
+ * const output = await figmaToNextJs({ variablesResponse, fileKey });
+ * fs.writeFileSync('theme.css', output.css);
+ * fs.writeFileSync('theme.ts', output.constants);
+ * ```
+ */
+export async function figmaToNextJs(
+  input: FigmaInput,
+  options?: NextJsAdapterOptions
+): Promise<NextJsOutput> {
+  const figmaAdapter = createFigmaAdapter();
+  const theme = await figmaAdapter.parse(input);
+
+  const outputAdapter = createNextJsAdapter();
+  return outputAdapter.transform(theme, options);
+}
+
+/**
+ * Generate Next.js output from normalized theme
+ */
+export async function generateNextJsOutput(
+  theme: ThemeFile,
+  options?: NextJsAdapterOptions
+): Promise<NextJsOutput> {
+  const adapter = createNextJsAdapter();
   return adapter.transform(theme, options);
 }

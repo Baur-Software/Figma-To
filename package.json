@@ -20,6 +20,19 @@
     "./adapters/tailwind-ionic": {
       "import": "./dist/adapters/tailwind-ionic/index.js",
       "types": "./dist/adapters/tailwind-ionic/index.d.ts"
+    },
+    "./adapters/nextjs": {
+      "import": "./dist/adapters/output/nextjs/index.js",
+      "types": "./dist/adapters/output/nextjs/index.d.ts"
+    },
+    "./nextjs": {
+      "import": "./dist/adapters/output/nextjs/index.js",
+      "types": "./dist/adapters/output/nextjs/index.d.ts"
+    },
+    "./nextjs-adapter": {
+      "import": "./dist/adapters/output/nextjs/nextjs-adapter.js",
+      "types": "./dist/adapters/output/nextjs/nextjs-adapter.d.ts",
+      "require": "./dist/adapters/output/nextjs/nextjs-adapter.js"
     }
   },
   "scripts": {
@@ -38,7 +51,9 @@
     "design-tokens",
     "mcp",
     "solidjs",
-    "capacitor"
+    "capacitor",
+    "nextjs",
+    "next.js"
   ],
   "author": "Baur Software",
   "license": "MIT",
